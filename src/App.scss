@@ -1,0 +1,45 @@
+@use "sass:map";
+
+@import "../node_modules/bootstrap/scss/bootstrap.scss";
+
+$theme-colors: (
+  "primary": #4Db33D
+);
+
+@font-face {
+    font-family: "LexendDeca-Light";
+    src: url("/fonts/LexendDeca-Light.ttf");
+}
+
+body {
+    font-family: "LexendDeca-Light" !important;
+}
+
+.title {
+  font-size: 25px;
+  display: inline;
+  margin-right: 20px;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #00684A;
+}
+
+.Row-selected {
+  background-color: #ABEBAB;
+}

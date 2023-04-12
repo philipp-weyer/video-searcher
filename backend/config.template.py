@@ -1,0 +1,2 @@
+MONGO_URL="<CLUSTER_URL>"
+MONGO_DB="videoSearcher"

@@ -23,6 +23,8 @@ def getTestVideo():
 app = Flask(__name__)
 CORS(app)
 app.config['UPLOAD_FOLDER'] = 'videos'
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
 
 @app.route("/getVideos", methods=["GET"])
 def getVideos():

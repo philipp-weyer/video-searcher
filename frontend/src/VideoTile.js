@@ -2,13 +2,16 @@ import {useState, useEffect} from 'react';
 
 import { Card } from 'react-bootstrap';
 
+import config from './config.json';
+
 function VideoTile(props) {
   return (
     <Card style={{
       paddingTop: '10px',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      height: '100%'
     }}>
-      <Card.Img variant="top" src={props.video.img} style={{
+      <Card.Img variant="top" src={config['ASSET_PREFIX'] + '/' + props.video.img} style={{
         'height': '100px',
         'width': '100%',
         'objectFit': 'contain',

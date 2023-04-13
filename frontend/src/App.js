@@ -53,7 +53,7 @@ function App() {
       <Row>
         <Col align="center">
           <InputGroup className="mb-3">
-            <UploadButton />
+            <UploadButton getVideos={() => getVideos()} />
             <Form.Control
               aria-label="Text to search for"
             />

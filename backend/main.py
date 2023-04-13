@@ -1,5 +1,7 @@
+from bson import ObjectId
 from flask_cors import CORS
 from flask import Flask, request, send_from_directory
+from flask.json import JSONEncoder
 import flask
 import os
 import pymongo
@@ -11,8 +13,14 @@ import thumbnail
 
 from config import MONGO_URL, MONGO_DB
 
-#  client = pymongo.MongoClient(MONGO_URL)
-#  database = client.get_database(MONGO_DB)
+client = pymongo.MongoClient(MONGO_URL)
+database = client.get_database(MONGO_DB)
+
+class CustomJSONEncoder(JSONEncoder):
+    def default(self, o):
+        if isinstance(o, ObjectId):
+            return str(o)
+        return super(CustomJSONEncoder, self).default(o)
 
 def getTestVideo():
     testVideo = {
@@ -24,6 +32,7 @@ def getTestVideo():
     return testVideo
 
 app = Flask(__name__)
+app.json_encoder = CustomJSONEncoder
 CORS(app)
 
 app.config['VIDEO_FOLDER'] = 'videos'
@@ -38,21 +47,23 @@ if not os.path.exists(app.config['THUMBNAIL_FOLDER']):
 def getVideos():
     #  videosCollection = database.videos
     #  videos = videosCollection.findMany({})
-    videos = [
-        getTestVideo(),
-        getTestVideo(),
-        getTestVideo(),
-        getTestVideo(),
-        getTestVideo(),
-        getTestVideo(),
-        getTestVideo(),
-        getTestVideo(),
-        getTestVideo(),
-        getTestVideo(),
-        getTestVideo(),
-        getTestVideo(),
-        getTestVideo()
-    ]
+    videos = list(database.videos.find())
+    print(videos)
+    #  videos = [
+        #  getTestVideo(),
+        #  getTestVideo(),
+        #  getTestVideo(),
+        #  getTestVideo(),
+        #  getTestVideo(),
+        #  getTestVideo(),
+        #  getTestVideo(),
+        #  getTestVideo(),
+        #  getTestVideo(),
+        #  getTestVideo(),
+        #  getTestVideo(),
+        #  getTestVideo(),
+        #  getTestVideo()
+    #  ]
 
     response = flask.jsonify(videos)
     return response
@@ -110,6 +121,13 @@ def uploadVideo():
     video.save(path)
 
     thumbnailPath = generateThumbnail(path)
+
+    database.videos.insert_one({
+        'img': thumbnailPath,
+        'title': request.form['title'],
+        'path': path,
+        'original_filename': original_filename
+    })
 
     response = flask.make_response(flask.jsonify({
         'message': 'Upload successful'

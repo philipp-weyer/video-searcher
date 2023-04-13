@@ -6,7 +6,7 @@ import { faUpload } from '@fortawesome/free-solid-svg-icons';
 
 import config from './config.json';
 
-const UploadButton = () => {
+const UploadButton = (props) => {
   const [showPopup, setShowPopup] = useState(false);
   const [title, setTitle] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
@@ -29,6 +29,7 @@ const UploadButton = () => {
       }).then(data => data.json()).then(res => console.log(res.message));
       // Handle success
       setShowPopup(false);
+      props.getVideos();
     } catch (error) {
       // Handle error
       console.error('Error uploading the file:', error);

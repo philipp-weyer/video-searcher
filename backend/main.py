@@ -8,6 +8,7 @@ import pymongo
 import random
 import uuid
 from werkzeug.utils import secure_filename
+import whisper
 
 import thumbnail
 
@@ -48,7 +49,6 @@ def getVideos():
     #  videosCollection = database.videos
     #  videos = videosCollection.findMany({})
     videos = list(database.videos.find())
-    print(videos)
     #  videos = [
         #  getTestVideo(),
         #  getTestVideo(),
@@ -93,6 +93,18 @@ def generateThumbnail(videoPath):
 
     return thumbnailPath
 
+def transcribe(videoPath, videoId):
+    model = whisper.load_model('base')
+    result = model.transcribe(videoPath)
+
+    print(result['segments'])
+
+    database.segments.insert_one({
+        'video_id': videoId,
+        'segments': result['segments'],
+        'text': result['text']
+    })
+
 @app.route("/uploadVideo", methods=['POST'])
 def uploadVideo():
     if 'title' not in request.form:
@@ -122,14 +134,35 @@ def uploadVideo():
 
     thumbnailPath = generateThumbnail(path)
 
-    database.videos.insert_one({
+    result = database.videos.insert_one({
         'img': thumbnailPath,
         'title': request.form['title'],
         'path': path,
         'original_filename': original_filename
     })
 
+    transcribe(path, result.inserted_id)
+
     response = flask.make_response(flask.jsonify({
         'message': 'Upload successful'
     }))
+    return response
+
+@app.route("/getSegments/<video>", methods=["GET"])
+def getSegments(video):
+    videos = list(database.segments.aggregate([{
+        '$match': {
+            'video_id': ObjectId(video)
+        }
+    }, {
+        '$unwind': {
+            'path': '$segments'
+        }
+    }, {
+        '$replaceRoot': {
+            'newRoot': '$segments'
+        }
+    }]))
+
+    response = flask.jsonify(videos)
     return response

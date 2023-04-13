@@ -15,6 +15,7 @@ import React, {useState, useEffect} from 'react';
 import './App.scss';
 
 import UploadButton from './UploadButton.js';
+import VideoModal from './VideoModal.js';
 import VideoTile from './VideoTile.js';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -42,6 +43,16 @@ function App() {
 
   useEffect(() => getVideos(), []);
 
+  const [selectedVideo, setSelectedVideo] = useState(null);
+
+  function toggleSelectedVideo(video) {
+    if (selectedVideo === null || selectedVideo._id !== video._id) {
+      setSelectedVideo(video);
+    } else {
+      setSelectedVideo(null);
+    }
+  }
+
   return (
     <Container className="App" style={{"paddingTop": "15px"}}>
       <Row style={{marginBottom: '20px'}}>
@@ -68,12 +79,17 @@ function App() {
           return (
             <Col key={video._id} align='left' xs={4} md={3} lg={2} style={{
               marginBottom: '20px'
-            }}>
+            }} onClick={() => toggleSelectedVideo(video)}>
               <VideoTile video={video} />
             </Col>
           );
         })}
       </Row>
+      <VideoModal
+        show={selectedVideo !== null}
+        onHide={() => setSelectedVideo(null)}
+        video={selectedVideo}
+      />
     </Container>
   );
 }

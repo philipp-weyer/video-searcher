@@ -61,11 +61,11 @@ const VideoModal = ({ show, onHide, video }) => {
 
     return (
       <p style={{fontSize: fontSize}}>
-        {texts.map((doc) => {
+        {texts.map((doc, index) => {
           if (doc.type == 'text') {
-            return <span>{doc.value}</span>
+            return <span key={index}>{doc.value}</span>
           } else {
-            return <b>{doc.value}</b>
+            return <b key={index}>{doc.value}</b>
           }
         })}
       </p>
@@ -95,32 +95,32 @@ const VideoModal = ({ show, onHide, video }) => {
             )}
             <Col lg={3}>
               <p>Video Segments</p>
-            <InputGroup className="mb-3">
-              <Form.Control
-                aria-label="Text to search for"
-                onChange={(e) => getSegments(e.target.value)}
-              />
-            </InputGroup>
-            <div>
-              {segments.map((segment) => {
-                return (
-                  <div key={segment.id}>
-                    <div
-                      style={{
-                        cursor: 'pointer'
-                      }}
-                      onClick={() => skipVideo(segment.start)}
-                      onMouseEnter={() => setHoverSegment(segment.id)}
-                      onMouseLeave={() => setHoverSegment(null)}
-                    >
-                      {timeElement(segment)}
-                      {textElement(segment)}
+              <InputGroup className="mb-3">
+                <Form.Control
+                  aria-label="Text to search for"
+                  onChange={(e) => getSegments(e.target.value)}
+                />
+              </InputGroup>
+              <div style={{maxHeight: '70vh', overflowY: 'auto'}}>
+                {segments.map((segment) => {
+                  return (
+                    <div key={segment.id}>
+                      <div
+                        style={{
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => skipVideo(segment.start)}
+                        onMouseEnter={() => setHoverSegment(segment.id)}
+                        onMouseLeave={() => setHoverSegment(null)}
+                      >
+                        {timeElement(segment)}
+                        {textElement(segment)}
+                      </div>
+                      <hr />
                     </div>
-                    <hr />
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
             </Col>
           </Row>
         </Container>

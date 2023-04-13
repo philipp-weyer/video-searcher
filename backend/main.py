@@ -160,7 +160,25 @@ def getSegments(video):
         '$match': {
             'video_id': ObjectId(video)
         }
+    }, {
+        '$sort': {
+            'start': 1
+        }
     }]
+
+    if 'text' in request.args:
+        search = {
+            '$search': {
+                'text': {
+                    'query': request.args['text'],
+                    'path': 'text',
+                    'fuzzy': {
+                        'maxEdits': 2
+                    }
+                }
+            }
+        }
+        aggregation.insert(0, search)
 
     videos = list(database.segments.aggregate(aggregation))
 

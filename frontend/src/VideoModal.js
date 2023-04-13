@@ -7,9 +7,13 @@ import config from './config.json';
 const VideoModal = ({ show, onHide, video }) => {
   const [segments, setSegments] = useState([]);
 
-  function getSegments() {
+  function getSegments(input='') {
     if (video) {
-      fetch(config['BACKEND_URL'] + '/getSegments/' + video._id)
+      let urlComponent = video._id;
+      if (input !== '') {
+        urlComponent += `?text=${encodeURIComponent(input)}`;
+      }
+      fetch(config['BACKEND_URL'] + '/getSegments/' + urlComponent)
         .then((data) => data.json())
         .then((res) => setSegments(res));
     } else {
@@ -18,9 +22,6 @@ const VideoModal = ({ show, onHide, video }) => {
   }
 
   useEffect(() => getSegments(), []);
-  if (segments.length > 0) {
-    console.log(segments[0])
-  }
 
   function timeElement(segment) {
     function getTime(seconds) {
@@ -74,18 +75,19 @@ const VideoModal = ({ show, onHide, video }) => {
             <InputGroup className="mb-3">
               <Form.Control
                 aria-label="Text to search for"
+                onChange={(e) => getSegments(e.target.value)}
               />
             </InputGroup>
-              <div>
-                {segments.map((segment) => {
-                  return (
-                    <div key={segment.id} style={{cursor: 'pointer'}} onClick={() => skipVideo(segment.start)}>
-                      {timeElement(segment)}
-                      <p style={{fontSize: '12px'}}>{segment.text}</p>
-                      <hr />
-                    </div>
-                  );
-                })}
+            <div>
+              {segments.map((segment) => {
+                return (
+                  <div key={segment.id} style={{cursor: 'pointer'}} onClick={() => skipVideo(segment.start)}>
+                    {timeElement(segment)}
+                    <p style={{fontSize: '12px'}}>{segment.text}</p>
+                    <hr />
+                  </div>
+                );
+              })}
             </div>
             </Col>
           </Row>

@@ -14,16 +14,28 @@ import {
 import React, {useState, useEffect} from 'react';
 import './App.scss';
 
+import UploadButton from './UploadButton.js';
 import VideoTile from './VideoTile.js';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+
+import config from './config.json';
+
+function uploadFile(e) {
+  let file = e.target.files[0];
+  let formData = new FormData();
+  formData.append('video', file);
+
+  fetch(config['BACKEND_URL'] + '/uploadVideo', {method: 'POST', body: formData})
+    .then((data) => data.json()).then(res => console.log(res)).catch((e) => console.log(e));
+}
 
 function App() {
   const [videos, setVideos] = useState([]);
 
   function getVideos() {
-    fetch('http://127.0.0.1:5001/getVideos')
+    fetch(config['BACKEND_URL'] + '/getVideos')
       .then((data) => data.json())
       .then((res) => setVideos(res));
   }
@@ -41,10 +53,7 @@ function App() {
       <Row>
         <Col align="center">
           <InputGroup className="mb-3">
-            <Button variant="outline-secondary" id="searchButton">
-              <FontAwesomeIcon size="lg" icon={faUpload} style={{marginRight:'10px'}}/>
-              Upload
-            </Button>
+            <UploadButton />
             <Form.Control
               aria-label="Text to search for"
             />

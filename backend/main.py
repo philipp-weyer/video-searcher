@@ -156,18 +156,10 @@ def uploadVideo():
 
 @app.route("/getSegments/<video>", methods=["GET"])
 def getSegments(video):
-    aggregation =[{
-        '$match': {
-            'video_id': ObjectId(video)
-        }
-    }, {
-        '$sort': {
-            'start': 1
-        }
-    }]
+    aggregation = []
 
     if 'text' in request.args:
-        search = {
+        aggregation += [{
             '$search': {
                 'text': {
                     'query': request.args['text'],
@@ -175,10 +167,31 @@ def getSegments(video):
                     'fuzzy': {
                         'maxEdits': 2
                     }
+                },
+                'highlight': {
+                    'path': 'text'
                 }
             }
+        }, {
+            '$set': {
+                'highlights': {
+                    '$meta': 'searchHighlights'
+                }
+            }
+        }]
+
+    aggregation += [{
+        '$match': {
+            'video_id': ObjectId(video)
         }
-        aggregation.insert(0, search)
+    }]
+
+    if 'text' not in request.args:
+        aggregation += [{
+            '$sort': {
+                'start': 1
+            }
+        }]
 
     videos = list(database.segments.aggregate(aggregation))
 

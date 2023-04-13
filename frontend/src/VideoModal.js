@@ -41,11 +41,30 @@ const VideoModal = ({ show, onHide, video }) => {
       return ret;
     }
 
-
     const timeString = getTime(segment.start) + ' - ' + getTime(segment.end);
 
     return (
       <p style={{color: 'blue'}}>{timeString}</p>
+    );
+  }
+
+  function textElement(segment) {
+    if (segment.highlights === undefined || segment.highlights.length == 0) {
+      return (<p style={{fontSize: '12px'}}>{segment.text}</p>);
+    }
+
+    let texts = segment.highlights[0].texts;
+
+    return (
+      <p style={{fontSize: '12px'}}>
+        {texts.map((doc) => {
+          if (doc.type == 'text') {
+            return <span>{doc.value}</span>
+          } else {
+            return <b>{doc.value}</b>
+          }
+        })}
+      </p>
     );
   }
 
@@ -83,7 +102,7 @@ const VideoModal = ({ show, onHide, video }) => {
                 return (
                   <div key={segment.id} style={{cursor: 'pointer'}} onClick={() => skipVideo(segment.start)}>
                     {timeElement(segment)}
-                    <p style={{fontSize: '12px'}}>{segment.text}</p>
+                    {textElement(segment)}
                     <hr />
                   </div>
                 );

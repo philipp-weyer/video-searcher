@@ -1,5 +1,5 @@
 from flask_cors import CORS
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 import flask
 import os
 import pymongo
@@ -49,6 +49,10 @@ def getVideos():
 
     response = flask.jsonify(videos)
     return response
+
+@app.route("/videos/<path:path>")
+def serveVideos(path):
+    return send_from_directory('videos', path)
 
 @app.route("/uploadVideo", methods=['POST'])
 def uploadVideo():

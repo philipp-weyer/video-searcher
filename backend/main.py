@@ -7,6 +7,8 @@ import random
 import uuid
 from werkzeug.utils import secure_filename
 
+import thumbnail
+
 from config import MONGO_URL, MONGO_DB
 
 #  client = pymongo.MongoClient(MONGO_URL)
@@ -23,9 +25,14 @@ def getTestVideo():
 
 app = Flask(__name__)
 CORS(app)
-app.config['UPLOAD_FOLDER'] = 'videos'
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
+
+app.config['VIDEO_FOLDER'] = 'videos'
+if not os.path.exists(app.config['VIDEO_FOLDER']):
+    os.makedirs(app.config['VIDEO_FOLDER'])
+
+app.config['THUMBNAIL_FOLDER'] = 'thumbnails'
+if not os.path.exists(app.config['THUMBNAIL_FOLDER']):
+    os.makedirs(app.config['THUMBNAIL_FOLDER'])
 
 @app.route("/getVideos", methods=["GET"])
 def getVideos():
@@ -54,6 +61,27 @@ def getVideos():
 def serveVideos(path):
     return send_from_directory('videos', path)
 
+@app.route("/thumbnails/<path:path>")
+def serveThumbnails(path):
+    return send_from_directory('thumbnails', path)
+
+def generateThumbnail(videoPath):
+    options = {
+        'trim': False,
+        'height': 300,
+        'width': 300,
+        'quality': 85,
+        'type': 'thumbnail'
+    }
+
+    thumbnailFilename = str(uuid.uuid4()) + '.jpg'
+    thumbnailPath = os.path.join(app.config['THUMBNAIL_FOLDER'],
+                                 thumbnailFilename)
+
+    thumbnail.generate_thumbnail(videoPath, thumbnailPath, options)
+
+    return thumbnailPath
+
 @app.route("/uploadVideo", methods=['POST'])
 def uploadVideo():
     if 'title' not in request.form:
@@ -76,17 +104,14 @@ def uploadVideo():
         }), 400)
         return response
 
-    if video:
-        original_filename = secure_filename(video.filename)
-        filename = str(uuid.uuid4()) + '.mp4'
-        video.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    original_filename = secure_filename(video.filename)
+    filename = str(uuid.uuid4()) + '.mp4'
+    path = os.path.join(app.config['VIDEO_FOLDER'], filename)
+    video.save(path)
 
-        response = flask.jsonify({
-            'message': 'Upload successful'
-        })
-        return response
+    thumbnailPath = generateThumbnail(path)
 
     response = flask.make_response(flask.jsonify({
-        'message': 'Something went wrong'
-    }), 400)
+        'message': 'Upload successful'
+    }))
     return response

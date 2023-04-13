@@ -97,12 +97,18 @@ def transcribe(videoPath, videoId):
     model = whisper.load_model('base')
     result = model.transcribe(videoPath)
 
-    print(result['segments'])
+    segments = []
 
-    database.segments.insert_one({
-        'video_id': videoId,
-        'segments': result['segments'],
-        'text': result['text']
+    for segment in result['segments']:
+        segment['video_id'] = videoId
+        segments.append(segment)
+
+    database.segments.insert_many(segments)
+
+    database.videos.update_one({'_id': ObjectId(videoId)}, {
+        '$set': {
+            'text': result['text']
+        }
     })
 
 @app.route("/uploadVideo", methods=['POST'])
@@ -150,19 +156,13 @@ def uploadVideo():
 
 @app.route("/getSegments/<video>", methods=["GET"])
 def getSegments(video):
-    videos = list(database.segments.aggregate([{
+    aggregation =[{
         '$match': {
             'video_id': ObjectId(video)
         }
-    }, {
-        '$unwind': {
-            'path': '$segments'
-        }
-    }, {
-        '$replaceRoot': {
-            'newRoot': '$segments'
-        }
-    }]))
+    }]
+
+    videos = list(database.segments.aggregate(aggregation))
 
     response = flask.jsonify(videos)
     return response

@@ -23,6 +23,8 @@ const VideoModal = ({ show, onHide, video }) => {
 
   useEffect(() => getSegments(), []);
 
+  const [hoverSegment, setHoverSegment] = useState(null);
+
   function timeElement(segment) {
     function getTime(seconds) {
       const hours = Math.floor(seconds / 3600);
@@ -49,14 +51,16 @@ const VideoModal = ({ show, onHide, video }) => {
   }
 
   function textElement(segment) {
+    let fontSize = segment.id == hoverSegment ? '14px' : '12px';
+
     if (segment.highlights === undefined || segment.highlights.length == 0) {
-      return (<p style={{fontSize: '12px'}}>{segment.text}</p>);
+      return (<p style={{fontSize: fontSize}}>{segment.text}</p>);
     }
 
     let texts = segment.highlights[0].texts;
 
     return (
-      <p style={{fontSize: '12px'}}>
+      <p style={{fontSize: fontSize}}>
         {texts.map((doc) => {
           if (doc.type == 'text') {
             return <span>{doc.value}</span>
@@ -100,9 +104,18 @@ const VideoModal = ({ show, onHide, video }) => {
             <div>
               {segments.map((segment) => {
                 return (
-                  <div key={segment.id} style={{cursor: 'pointer'}} onClick={() => skipVideo(segment.start)}>
-                    {timeElement(segment)}
-                    {textElement(segment)}
+                  <div key={segment.id}>
+                    <div
+                      style={{
+                        cursor: 'pointer'
+                      }}
+                      onClick={() => skipVideo(segment.start)}
+                      onMouseEnter={() => setHoverSegment(segment.id)}
+                      onMouseLeave={() => setHoverSegment(null)}
+                    >
+                      {timeElement(segment)}
+                      {textElement(segment)}
+                    </div>
                     <hr />
                   </div>
                 );

@@ -4,6 +4,7 @@ import flask
 import os
 import pymongo
 import random
+import uuid
 from werkzeug.utils import secure_filename
 
 from config import MONGO_URL, MONGO_DB
@@ -51,6 +52,12 @@ def getVideos():
 
 @app.route("/uploadVideo", methods=['POST'])
 def uploadVideo():
+    if 'title' not in request.form:
+        response = flask.make_response(flask.jsonify({
+            'message': 'No title in request'
+        }), 400)
+        return response
+
     if 'video' not in request.files:
         response = flask.make_response(flask.jsonify({
             'message': 'No video in request'
@@ -66,7 +73,8 @@ def uploadVideo():
         return response
 
     if video:
-        filename = secure_filename(video.filename)
+        original_filename = secure_filename(video.filename)
+        filename = str(uuid.uuid4()) + '.mp4'
         video.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
         response = flask.jsonify({

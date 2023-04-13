@@ -18,7 +18,13 @@ function VideoTile(props) {
         'display': 'block'
       }}/>
       <Card.Body>
-        <Card.Text>{props.video.title}</Card.Text>
+        <Card.Text style={{
+          fontSize: '14px',
+          textAlign: 'justify',
+          hyphens: 'auto'
+        }}>
+          {props.video.title}
+        </Card.Text>
       </Card.Body>
     </Card>
   );

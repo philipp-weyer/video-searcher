@@ -72,8 +72,11 @@ def getVideos():
                     }]
                 }
             }
+        }, {
+            '$project': {
+                'text': 0
+            }
         }]))
-        print(videos)
 
     response = flask.jsonify(videos)
     return response

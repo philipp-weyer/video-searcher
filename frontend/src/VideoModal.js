@@ -86,7 +86,7 @@ const VideoModal = ({ show, onHide, video }) => {
         <Modal.Title>{video?.title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Container>
+        <Container fluid>
           <Row>
             {video && (
               <Col lg={9}>

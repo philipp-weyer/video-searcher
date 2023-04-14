@@ -35,8 +35,13 @@ function uploadFile(e) {
 function App() {
   const [videos, setVideos] = useState([]);
 
-  function getVideos() {
-    fetch(config['BACKEND_URL'] + '/getVideos')
+  function getVideos(input='') {
+    let urlComponent = '';
+    if (input !== '') {
+      urlComponent += `?text=${encodeURIComponent(input)}`;
+    }
+
+    fetch(config['BACKEND_URL'] + '/getVideos' + urlComponent)
       .then((data) => data.json())
       .then((res) => setVideos(res));
   }
@@ -67,8 +72,15 @@ function App() {
             <UploadButton getVideos={() => getVideos()} />
             <Form.Control
               aria-label="Text to search for"
+              id='searchBox'
+              onKeyDown={(e) => {
+                if (e.code == 'Enter') {
+                  getVideos(e.target.value)
+                }
+              }}
             />
-            <Button variant="outline-primary" id="searchButton">
+            <Button variant="outline-primary" id="searchButton"
+              onClick={() => getVideos(document.getElementById('searchBox').value)}>
               <FontAwesomeIcon size="lg" icon={faMagnifyingGlass}/>
             </Button>
           </InputGroup>

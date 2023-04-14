@@ -46,24 +46,34 @@ if not os.path.exists(app.config['THUMBNAIL_FOLDER']):
 
 @app.route("/getVideos", methods=["GET"])
 def getVideos():
-    #  videosCollection = database.videos
-    #  videos = videosCollection.findMany({})
-    videos = list(database.videos.find())
-    #  videos = [
-        #  getTestVideo(),
-        #  getTestVideo(),
-        #  getTestVideo(),
-        #  getTestVideo(),
-        #  getTestVideo(),
-        #  getTestVideo(),
-        #  getTestVideo(),
-        #  getTestVideo(),
-        #  getTestVideo(),
-        #  getTestVideo(),
-        #  getTestVideo(),
-        #  getTestVideo(),
-        #  getTestVideo()
-    #  ]
+    if 'text' not in request.args:
+        videos = list(database.videos.find())
+    else:
+        videos = list(database.videos.aggregate([{
+            '$search': {
+                'compound': {
+                    'must': [{
+                        'text': {
+                            'query': request.args['text'],
+                            'path': 'title',
+                            'fuzzy': {
+                                'maxEdits': 2
+                            }
+                        }
+                    }],
+                    'should': [{
+                        'text': {
+                            'query': request.args['text'],
+                            'path': 'text',
+                            'fuzzy': {
+                                'maxEdits': 2
+                            }
+                        }
+                    }]
+                }
+            }
+        }]))
+        print(videos)
 
     response = flask.jsonify(videos)
     return response

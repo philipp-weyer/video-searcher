@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask import Flask, request, send_from_directory
 from flask.json import JSONEncoder
 import flask
+from multiprocessing import Process
 import os
 import pymongo
 import random
@@ -12,6 +13,11 @@ from werkzeug.utils import secure_filename
 import thumbnail
 
 from config import MONGO_URL, MONGO_DB
+
+from generateSubtitles import subtitleService
+
+p = Process(target=subtitleService)
+p.start()
 
 client = pymongo.MongoClient(MONGO_URL)
 database = client.get_database(MONGO_DB)

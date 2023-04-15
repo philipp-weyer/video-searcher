@@ -42,13 +42,18 @@ def watchVideoCollection(db):
             print('Video was uploaded')
             transcribe(change['fullDocument'], db)
 
-while True:
-    try:
-        client = pymongo.MongoClient(MONGO_URL)
-        database = client.get_database(MONGO_DB)
+def subtitleService():
+    print('generate')
+    while True:
+        try:
+            client = pymongo.MongoClient(MONGO_URL)
+            database = client.get_database(MONGO_DB)
 
-        watchVideoCollection(database)
-    except KeyboardInterrupt:
-        sys.exit(0)
-    except:
-        pass
+            watchVideoCollection(database)
+        except KeyboardInterrupt:
+            sys.exit(0)
+        except:
+            pass
+
+if __name__ == '__main__':
+    subtitleService()

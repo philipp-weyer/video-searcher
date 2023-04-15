@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react';
 
-import { Modal, Row, Col, Container, InputGroup, Form } from 'react-bootstrap';
+import {
+  Button,
+  Modal,
+  Row,
+  Col,
+  Container,
+  InputGroup,
+  Form
+} from 'react-bootstrap';
 
 import config from './config.json';
+
+import DeleteDialog from './DeleteDialog.js';
 
 const VideoModal = ({ show, onHide, video }) => {
   const [segments, setSegments] = useState([]);
@@ -76,6 +86,14 @@ const VideoModal = ({ show, onHide, video }) => {
     document.getElementById('videoElement').currentTime = seconds;
   }
 
+  const [deleteSelected, setDeleteSelected] = useState(false);
+
+  function deleteVideo(video) {
+    fetch(config['BACKEND_URL'] + '/deleteVideo/' + video._id)
+      .then((data) => data.json())
+      .then(onHide);
+  }
+
   return (
     <Modal
       show={show}
@@ -91,6 +109,12 @@ const VideoModal = ({ show, onHide, video }) => {
             {video && (
               <Col lg={9}>
                 <video id="videoElement" width="100%" height="auto" controls src={config['ASSET_PREFIX'] + '/' + video.path}></video>
+                <Button
+                  variant='danger'
+                  onClick={() => setDeleteSelected(true)}
+                >
+                  Delete Video
+                </Button>
               </Col>
             )}
             <Col lg={3}>
@@ -124,6 +148,10 @@ const VideoModal = ({ show, onHide, video }) => {
             </Col>
           </Row>
         </Container>
+        <DeleteDialog
+          show={deleteSelected}
+          onHide={() => setDeleteSelected(false)}
+          onDelete={() => deleteVideo(video)} />
       </Modal.Body>
     </Modal>
   );

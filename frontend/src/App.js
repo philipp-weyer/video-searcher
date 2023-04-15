@@ -14,6 +14,7 @@ import {
 import React, {useState, useEffect} from 'react';
 import './App.scss';
 
+import LoadingBanner from './LoadingBanner.js';
 import UploadButton from './UploadButton.js';
 import VideoModal from './VideoModal.js';
 import VideoTile from './VideoTile.js';
@@ -67,6 +68,11 @@ function App() {
         </Col>
       </Row>
       <Row>
+        <Col fluid>
+          <LoadingBanner />
+        </Col>
+      </Row>
+      <Row>
         <Col align="center">
           <InputGroup className="mb-3">
             <UploadButton getVideos={() => getVideos()} />
@@ -99,7 +105,10 @@ function App() {
       </Row>
       <VideoModal
         show={selectedVideo !== null}
-        onHide={() => setSelectedVideo(null)}
+        onHide={() => {
+          setSelectedVideo(null);
+          getVideos(document.getElementById('searchBox').value)
+        }}
         video={selectedVideo}
       />
     </Container>

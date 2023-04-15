@@ -210,3 +210,17 @@ def getSegments(video):
 
     response = flask.jsonify(videos)
     return response
+
+@app.route('/deleteVideo/<videoId>')
+def deleteVideo(videoId):
+    video = database.videos.find_one({'_id': ObjectId(videoId)})
+
+    database.segments.delete_many({'video_id': ObjectId(videoId)})
+    database.videos.delete_one({'_id': ObjectId(videoId)})
+
+    os.remove(video['path'])
+    os.remove(video['img'])
+
+    response = flask.jsonify({'message': 'Delete successful'})
+
+    return response

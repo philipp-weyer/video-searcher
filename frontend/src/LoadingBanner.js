@@ -2,13 +2,11 @@ import React, {useState, useEffect} from 'react';
 
 import { Spinner } from 'react-bootstrap';
 
-import config from './config.json';
-
 const LoadingBanner = () => {
   const [missingSubtitles, setMissingSubtitles] = useState([]);
 
   function getSubtitleStatus() {
-    fetch(config['BACKEND_URL'] + '/' + 'getSubtitleStatus')
+    fetch('/getSubtitleStatus')
       .then(data => data.json())
       .then(res => setMissingSubtitles(res));
   }

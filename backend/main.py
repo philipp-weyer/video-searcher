@@ -12,7 +12,7 @@ from werkzeug.utils import secure_filename
 
 import thumbnail
 
-from config import MONGO_URL, MONGO_DB
+from config import MONGO_URL, MONGO_DB, FRONTEND_PATH
 
 from generateSubtitles import subtitleService
 
@@ -37,7 +37,7 @@ def getTestVideo():
 
     return testVideo
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=FRONTEND_PATH)
 app.json_encoder = CustomJSONEncoder
 CORS(app)
 
@@ -48,6 +48,14 @@ if not os.path.exists(app.config['VIDEO_FOLDER']):
 app.config['THUMBNAIL_FOLDER'] = 'thumbnails'
 if not os.path.exists(app.config['THUMBNAIL_FOLDER']):
     os.makedirs(app.config['THUMBNAIL_FOLDER'])
+
+@app.route("/", methods=["GET"], defaults={'path': ''})
+@app.route("/<path:path>")
+def serve(path):
+    if path != "" and os.path.exists(app.static_folder + '/' + path):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
 
 @app.route("/getVideos", methods=["GET"])
 def getVideos():
@@ -140,7 +148,7 @@ def uploadVideo():
 
     thumbnailPath = generateThumbnail(path)
 
-    result = database.videos.insert_one({
+    database.videos.insert_one({
         'img': thumbnailPath,
         'title': request.form['title'],
         'path': path,

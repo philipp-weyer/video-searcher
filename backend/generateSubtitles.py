@@ -43,7 +43,6 @@ def watchVideoCollection(db):
             transcribe(change['fullDocument'], db)
 
 def subtitleService():
-    print('generate')
     while True:
         try:
             client = pymongo.MongoClient(MONGO_URL)

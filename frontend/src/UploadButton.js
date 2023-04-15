@@ -4,8 +4,6 @@ import { Button, Modal, Form, InputGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUpload } from '@fortawesome/free-solid-svg-icons';
 
-import config from './config.json';
-
 const UploadButton = (props) => {
   const [showPopup, setShowPopup] = useState(false);
   const [title, setTitle] = useState('');
@@ -23,7 +21,7 @@ const UploadButton = (props) => {
     formData.append('video', selectedFile);
 
     try {
-      await fetch(config['BACKEND_URL'] + '/uploadVideo', {
+      await fetch('/uploadVideo', {
         method: 'POST',
         body: formData,
       }).then(data => data.json()).then(res => console.log(res.message));

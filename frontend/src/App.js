@@ -22,14 +22,12 @@ import VideoTile from './VideoTile.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 
-import config from './config.json';
-
 function uploadFile(e) {
   let file = e.target.files[0];
   let formData = new FormData();
   formData.append('video', file);
 
-  fetch(config['BACKEND_URL'] + '/uploadVideo', {method: 'POST', body: formData})
+  fetch('/uploadVideo', {method: 'POST', body: formData})
     .then((data) => data.json()).then(res => console.log(res)).catch((e) => console.log(e));
 }
 
@@ -42,7 +40,7 @@ function App() {
       urlComponent += `?text=${encodeURIComponent(input)}`;
     }
 
-    fetch(config['BACKEND_URL'] + '/getVideos' + urlComponent)
+    fetch('/getVideos' + urlComponent)
       .then((data) => data.json())
       .then((res) => setVideos(res));
   }

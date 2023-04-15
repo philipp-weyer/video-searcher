@@ -10,8 +10,6 @@ import {
   Form
 } from 'react-bootstrap';
 
-import config from './config.json';
-
 import DeleteDialog from './DeleteDialog.js';
 
 const VideoModal = ({ show, onHide, video }) => {
@@ -23,7 +21,7 @@ const VideoModal = ({ show, onHide, video }) => {
       if (input !== '') {
         urlComponent += `?text=${encodeURIComponent(input)}`;
       }
-      fetch(config['BACKEND_URL'] + '/getSegments/' + urlComponent)
+      fetch('/getSegments/' + urlComponent)
         .then((data) => data.json())
         .then((res) => setSegments(res));
     } else {
@@ -89,7 +87,7 @@ const VideoModal = ({ show, onHide, video }) => {
   const [deleteSelected, setDeleteSelected] = useState(false);
 
   function deleteVideo(video) {
-    fetch(config['BACKEND_URL'] + '/deleteVideo/' + video._id)
+    fetch('/deleteVideo/' + video._id)
       .then((data) => data.json())
       .then(onHide);
   }
@@ -108,7 +106,7 @@ const VideoModal = ({ show, onHide, video }) => {
           <Row>
             {video && (
               <Col lg={9}>
-                <video id="videoElement" width="100%" height="auto" controls src={config['ASSET_PREFIX'] + '/' + video.path}></video>
+                <video id="videoElement" width="100%" height="auto" controls src={'/' + video.path}></video>
                 <Button
                   variant='danger'
                   onClick={() => setDeleteSelected(true)}

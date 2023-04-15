@@ -8,7 +8,6 @@ import pymongo
 import random
 import uuid
 from werkzeug.utils import secure_filename
-import whisper
 
 import thumbnail
 
@@ -106,24 +105,6 @@ def generateThumbnail(videoPath):
 
     return thumbnailPath
 
-def transcribe(videoPath, videoId):
-    model = whisper.load_model('base')
-    result = model.transcribe(videoPath)
-
-    segments = []
-
-    for segment in result['segments']:
-        segment['video_id'] = videoId
-        segments.append(segment)
-
-    database.segments.insert_many(segments)
-
-    database.videos.update_one({'_id': ObjectId(videoId)}, {
-        '$set': {
-            'text': result['text']
-        }
-    })
-
 @app.route("/uploadVideo", methods=['POST'])
 def uploadVideo():
     if 'title' not in request.form:
@@ -159,8 +140,6 @@ def uploadVideo():
         'path': path,
         'original_filename': original_filename
     })
-
-    transcribe(path, result.inserted_id)
 
     response = flask.make_response(flask.jsonify({
         'message': 'Upload successful'
@@ -222,5 +201,23 @@ def deleteVideo(videoId):
     os.remove(video['img'])
 
     response = flask.jsonify({'message': 'Delete successful'})
+
+    return response
+
+@app.route('/getSubtitleStatus')
+def getSubtitleStatus():
+    missingSubtitles = database.videos.aggregate([{
+        '$match': {
+            'text': {
+                '$exists': False
+            }
+        }
+    }, {
+        '$project': {
+            'title': 1
+        }
+    }])
+
+    response = flask.jsonify(list(missingSubtitles))
 
     return response

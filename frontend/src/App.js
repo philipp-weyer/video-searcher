@@ -60,7 +60,7 @@ function App() {
   }
 
   return (
-    <Container className="App" style={{"paddingTop": "15px"}}>
+    <Container className="App" style={{"paddingTop": "15px"}} fluid>
       <Row style={{marginBottom: '20px'}}>
         <Col align="center">
           <p className="title">MongoDB Video Searcher</p>
@@ -68,7 +68,7 @@ function App() {
         </Col>
       </Row>
       <Row>
-        <Col fluid>
+        <Col>
           <LoadingBanner />
         </Col>
       </Row>

@@ -149,7 +149,7 @@ const VideoModal = ({ show, onHide, video }) => {
         <DeleteDialog
           show={deleteSelected}
           onHide={() => setDeleteSelected(false)}
-          onDelete={() => deleteVideo(video)} />
+          onDelete={() => {setDeleteSelected(false); deleteVideo(video)}} />
       </Modal.Body>
     </Modal>
   );

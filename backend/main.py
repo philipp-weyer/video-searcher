@@ -65,7 +65,7 @@ def getVideos():
         videos = list(database.videos.aggregate([{
             '$search': {
                 'compound': {
-                    'must': [{
+                    'should': [{
                         'text': {
                             'query': request.args['text'],
                             'path': 'title',
@@ -73,8 +73,7 @@ def getVideos():
                                 'maxEdits': 2
                             }
                         }
-                    }],
-                    'should': [{
+                    }, {
                         'text': {
                             'query': request.args['text'],
                             'path': 'text',

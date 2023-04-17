@@ -42,7 +42,7 @@ const LoadingBanner = () => {
             left: '70px',
             transform: 'translateY(-50%)'}}
           >
-            Loading subtitles for {subtitleString}
+            Generating subtitles for {subtitleString}
           </span>
         </div>: null
       }
